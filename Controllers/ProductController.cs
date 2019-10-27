@@ -6,19 +6,22 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using CoffeeMug.Persistence;
+using CoffeeMug.Core;
 
 namespace CoffeeMug.Controllers
 {
     [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    public class ProductController : Controller
     {
-        private readonly ProductRepository _repository;
+        private readonly IProductRepositoryModel _repository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductController(ProductRepository context, IMapper mapper)
+        public ProductController(IProductRepositoryModel context, IMapper mapper, IUnitOfWork unitOfWork)
         {
             this._repository = context;
             this._mapper = mapper;
+            this._unitOfWork = unitOfWork;
         }
 
         // GET: api/product
@@ -46,24 +49,21 @@ namespace CoffeeMug.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            if (await _repository.GetProduct(model.Id) != null)
+                return BadRequest("Id not unique");    
             //TODO: check mapping
             var product = _mapper.Map<ProductCreateInputModel, Product>(model);
+            _repository.Add(product);
 
+            // TODO: add unitofwork
+            // po co te fragmenty? jakie ID zwrócić?
+            // czy ID się zmienia po Post?
+            await _unitOfWork.CompleteAsync();
 
-            // TODO: create repository
-            // repository.Add(vehicle);
-            // await unitOfWork.CompleteAsync();
-
-            // vehicle = await repository.GetVehicle(vehicle.Id);
-
-            // var result = mapper.Map<Vehicle, VehicleResource>(vehicle);
-
-            // return Ok(result);
-            // _repository.Products.Add();
-            return Ok(model.Id);
+            return Ok(product.Id);
         }
 
-        // PUT api/values/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody]ProductUpdateInputModel model)
         {
@@ -73,26 +73,27 @@ namespace CoffeeMug.Controllers
             var product = await _repository.GetProduct(model);
 
             if (product == null)
-            return NotFound();
+                return NotFound();
 
-            _mapper.Map<ProductUpdateInputModel, Product>(model)
+            _mapper.Map<ProductUpdateInputModel, Product>(model);
+
+            await _unitOfWork.CompleteAsync();
+
             return Ok();
-            throw new NotImplementedException(); //dodać mapper;
-
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var product = _repository.Products.Find(p => p.Id == id);
-
+            var product = await _repository.GetProduct(id);
 
             if (product == null)
                 return NotFound();
 
-            _repository.Products.Remove(product);
+            _repository.Remove(product);
+            await _unitOfWork.CompleteAsync();
 
-            return Ok(id);
+            return Ok();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace CoffeeMug.Models
 {
     public class ProductUpdateInputModel
     {
-        [Required]
+        [Required]        
         public Guid Id { get; set; }
         [Required]
         [StringLength(100)]

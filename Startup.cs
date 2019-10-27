@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using CoffeeMug.Models;
 using CoffeeMug.Persistence;
+using CoffeeMug.Core;
+using AutoMapper;
 
 namespace CoffeeMug
 {
@@ -20,8 +22,13 @@ namespace CoffeeMug
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IProductRepositoryModel, ProductRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddDbContext<ProductContext>(opt =>
-                opt.UseInMemoryDatabase(nameof(ProductContext.Products)));
+               opt.UseInMemoryDatabase(nameof(ProductContext.Products)));
+
             services.AddMvc();
         }
 
