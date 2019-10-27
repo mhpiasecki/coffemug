@@ -13,11 +13,11 @@ namespace CoffeeMug.Controllers
     [Route("api/[controller]")]
     public class ProductController : Controller
     {
-        private readonly IProductRepositoryModel _repository;
+        private readonly IProductRepository _repository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductController(IProductRepositoryModel context, IMapper mapper, IUnitOfWork unitOfWork)
+        public ProductController(IProductRepository context, IMapper mapper, IUnitOfWork unitOfWork)
         {
             this._repository = context;
             this._mapper = mapper;
@@ -63,11 +63,10 @@ namespace CoffeeMug.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody]ProductUpdateInputModel model)
         {
-            //TODO: nie działa validate price i id;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var product = await _repository.GetProduct(model);
+            var product = await _repository.GetProduct((Guid)model.Id);
 
             if (product == null)
                 return NotFound();

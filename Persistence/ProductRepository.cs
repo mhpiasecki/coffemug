@@ -8,7 +8,7 @@ using CoffeeMug.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CoffeeMug.Persistence
 {
-    public class ProductRepository : IProductRepositoryModel
+    public class ProductRepository : IProductRepository
     {
         private readonly ProductContext _context;
 
@@ -17,9 +17,9 @@ namespace CoffeeMug.Persistence
             this._context = context;
         }
 
-        public void Add(Product product)
+        public  void Add(Product product)
         {
-            _context.Products.Add(product);
+           _context.Products.Add(product);
         }
 
         public async Task<Product> GetProduct(Guid id)
@@ -39,7 +39,7 @@ namespace CoffeeMug.Persistence
 
         public void Remove(Product product)
         {
-            _context.Remove(product);
+           _context.Remove(product);
         }
     }
 }
