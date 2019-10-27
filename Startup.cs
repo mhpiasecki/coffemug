@@ -26,8 +26,11 @@ namespace CoffeeMug
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddDbContext<ProductContext>(opt =>
-               opt.UseInMemoryDatabase(nameof(ProductContext.Products)));
+            // services.AddDbContext<ProductContext>(opt =>
+            //    opt.UseInMemoryDatabase(nameof(ProductContext.Products)));
+
+        services.AddDbContext<ProductContext>(options => options.UseSqlServer
+        ("Server=localhost;Database=CoffeeMugDB;User Id=sa;Password=CoffeeMug123;"));
 
             services.AddMvc();
         }
