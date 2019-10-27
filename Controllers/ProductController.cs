@@ -47,18 +47,16 @@ namespace CoffeeMug.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]ProductCreateInputModel model)
         {
+// TODO: nie działa validate - price required
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if (await _repository.GetProduct(model.Id) != null)
                 return BadRequest("Id not unique");    
-            //TODO: check mapping
             var product = _mapper.Map<ProductCreateInputModel, Product>(model);
             _repository.Add(product);
 
-            // TODO: add unitofwork
-            // po co te fragmenty? jakie ID zwrócić?
-            // czy ID się zmienia po Post?
             await _unitOfWork.CompleteAsync();
 
             return Ok(product.Id);
@@ -67,6 +65,7 @@ namespace CoffeeMug.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody]ProductUpdateInputModel model)
         {
+            //TODO: nie działa validate price i id;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -75,7 +74,7 @@ namespace CoffeeMug.Controllers
             if (product == null)
                 return NotFound();
 
-            _mapper.Map<ProductUpdateInputModel, Product>(model);
+           var result = _mapper.Map<ProductUpdateInputModel, Product>(model, product);
 
             await _unitOfWork.CompleteAsync();
 
