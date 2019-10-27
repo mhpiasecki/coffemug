@@ -47,8 +47,6 @@ namespace CoffeeMug.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]ProductCreateInputModel model)
         {
-// TODO: nie działa validate - price required
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

@@ -6,11 +6,11 @@ namespace CoffeeMug.Models
     public class ProductUpdateInputModel
     {
         [Required]        
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
         [Required]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
     }
 }
